@@ -1,9 +1,31 @@
+/* eslint-disable no-plusplus */
 import { NextReactP5Wrapper } from "@p5-wrapper/next";
+import Image from "next/image";
 import { type Sketch } from "react-p5-wrapper";
+
+import Yokai from "../public/assets/images/yokai.jpeg";
+
+const bg = 0;
+const fg = "#f1f1f1";
+const tilesX = 30;
+const tilesY = tilesX;
+// eslint-disable-next-line unused-imports/no-unused-vars
+let img = {};
 
 const sketch: Sketch = (p5) => {
   // eslint-disable-next-line no-param-reassign
-  p5.setup = () => p5.createCanvas(600, 450);
+  p5.preload = () => {
+    img = p5.loadImage(Yokai);
+  };
+  // eslint-disable-next-line no-param-reassign
+  p5.setup = () => {
+    // p5.preload();
+    p5.createCanvas(600, 600);
+
+    // console.log(img);
+    // const img = p5.loadImage(Yokai);
+    // p5.image.p5.resize(tilesX, tilesY);
+  };
   // eslint-disable-next-line no-param-reassign
   p5.draw = () => {
     // p5.background("#f1f1f1");
@@ -24,21 +46,32 @@ const sketch: Sketch = (p5) => {
     //   p5.ellipse(0, 0, 15, 15);
     //   p5.pop();
     // }
-    p5.background(0);
-    p5.noStroke();
-    let x;
-    let y;
-    const amount = 720;
-    const size = 5;
-    p5.fill("#f1f1f1");
-    for (let i = 0; i < amount; i++) {
-      y = p5.map(p5.sin(p5.radians(i)), -1, 1, -100, 100);
-      x = p5.map(i, 0, amount, 0, p5.width);
-      p5.ellipse(x, y + p5.height / 2, size, size);
+    if (img) {
+      p5.background(bg);
+      p5.fill(fg);
+      p5.noStroke();
+
+      const tileW = p5.width / tilesX;
+      const tileH = p5.height / tilesY;
+
+      for (let x = 0; x < tilesX; x++) {
+        for (let y = 0; y < tilesY; y++) {
+          const c = p5.img.get(x, y);
+          const b = p5.brightness(c);
+          p5.fill(b);
+
+          p5.rect(x * tileW, y * tileH, tileW, tileH);
+        }
+      }
     }
   };
 };
 
 export default function Test() {
-  return <NextReactP5Wrapper sketch={sketch} />;
+  return (
+    <div>
+      <NextReactP5Wrapper sketch={sketch} />
+      <Image src={Yokai} alt="yo" />
+    </div>
+  );
 }
